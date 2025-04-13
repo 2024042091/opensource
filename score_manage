@@ -1,0 +1,106 @@
+#프로그램명 : score_manage
+#작성자 : 소프트웨어학부 / 김성령
+#작성일 : 25.04.14
+#프로그램 설명 : 성적관리프로그램 (객체지향 프로그램으로 수정하기)
+class Student:
+    def __init__(self, id, name, english, c, python):
+        self.id = id
+        self.name = name
+        self.english = english
+        self.c = c
+        self.python = python
+        self.total = 0
+        self.avg = 0
+        self.grade = ''
+        self.rank = 0
+        self.calc_total_avg()
+        self.calc_grade()
+
+    def calc_total_avg(self):
+        self.total = self.english + self.c + self.python
+        self.avg = self.total / 3
+
+    def calc_grade(self):
+        if self.avg >= 90:
+            self.grade = 'A'
+        elif self.avg >= 80:
+            self.grade = 'B'
+        elif self.avg >= 70:
+            self.grade = 'C'
+        elif self.avg >= 60:
+            self.grade = 'D'
+        else:
+            self.grade = 'F'
+
+    def __str__(self):
+        return f"{self.id:<10}{self.name:<10}{self.english:<8}{self.c:<8}{self.python:<8}{self.total:<8}{self.avg:<8.2f}{self.grade:<8}{self.rank:<5}"
+
+
+class GradeManager:
+    def __init__(self):
+        self.students = []
+
+    def input_students(self, n=5):
+        for i in range(n):
+            print(f"\n[{i+1}번째 학생 정보 입력]")
+            id = input("학번: ")
+            name = input("이름: ")
+            english = int(input("영어 점수: "))
+            c = int(input("C-언어 점수: "))
+            python = int(input("파이썬 점수: "))
+            student = Student(id, name, english, c, python)
+            self.students.append(student)
+        self.calc_ranks()
+
+    def calc_ranks(self):
+        sorted_students = sorted(self.students, key=lambda x: x.total, reverse=True)
+        for i, student in enumerate(sorted_students):
+            student.rank = i + 1
+
+    def print_students(self):
+        print("\n학번      이름      영어     C언어     파이썬    총점     평균     학점     등수")
+        for s in self.students:
+            print(s)
+
+    def add_student(self):
+        print("\n[학생 추가]")
+        id = input("학번: ")
+        name = input("이름: ")
+        english = int(input("영어 점수: "))
+        c = int(input("C-언어 점수: "))
+        python = int(input("파이썬 점수: "))
+        student = Student(id, name, english, c, python)
+        self.students.append(student)
+        self.calc_ranks()
+
+    def delete_student(self, id):
+        self.students = [s for s in self.students if s.id != id]
+        self.calc_ranks()
+
+    def search_by_id(self, id):
+        return [s for s in self.students if s.id == id]
+
+    def search_by_name(self, name):
+        return [s for s in self.students if s.name == name]
+
+    def sort_by_total(self):
+        self.students.sort(key=lambda x: x.total, reverse=True)
+
+    def count_above_80(self):
+        return len([s for s in self.students if s.avg >= 80])
+
+if __name__ == "__main__":
+    gm = GradeManager()
+    gm.input_students()
+    gm.print_students()
+
+    print("\n총점 기준 정렬 후 출력:")
+    gm.sort_by_total()
+    gm.print_students()
+
+    print("\n80점 이상 학생 수:", gm.count_above_80())
+
+    gm.add_student()
+    gm.print_students()
+    gm.delete_student(input("삭제할 학번 입력: "))
+    gm.print_students()
